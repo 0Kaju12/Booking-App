@@ -2,15 +2,23 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-const authRoutes = require('./routes/auth');
+const cors = require('cors'); 
+const authRoutes = require('./routes/auth')
+const bookingRoutes = require('./routes/booking');
+const managerRoutes = require('./routes/manager')
+
 
 dotenv.config();
 
 const app = express();
+app.use(cors())
 app.use(bodyParser.json());
 
 
 app.use('/api/auth', authRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/manager', managerRoutes);
+
 
 
 // Connect to MongoDB
