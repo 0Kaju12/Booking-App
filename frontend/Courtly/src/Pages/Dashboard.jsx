@@ -1,14 +1,25 @@
 import React from 'react';
 import { Calendar, Clock, Users } from 'lucide-react';
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from '../utils/authSlice';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
-function Dashboard () {
+function Dashboard() {
   const courts = ['Court 1', 'Court 2', 'Court 3', 'Court 4', 'Court 5', 'Court 6'];
   const hours = ['4 AM', '5 AM', '6 AM', '7 AM', '8 AM', '9 AM', '10 AM'];
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const handleLogout = () => {
+    dispatch(logout()); // Call logout as a function
+    navigate('/'); // Redirect to the root route after logging out
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900 text-white p-6">
+      <div className="w-64 bg-gray-900 text-white p-6 relative">
         <h1 className="text-2xl font-bold mb-8">NEXUS</h1>
         <nav>
           <ul className="space-y-4">
@@ -38,7 +49,16 @@ function Dashboard () {
           <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
             TN
           </div>
-          <span>Tarikul</span>
+          <span>{user.name}</span>
+        </div>
+        {/* Logout Button */}
+        <div className="absolute bottom-16 left-6">
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+          >
+            Logout
+          </button>
         </div>
       </div>
 
@@ -66,7 +86,7 @@ function Dashboard () {
             {courts.map((court, index) => (
               <div key={index} className="text-center font-semibold">{court}</div>
             ))}
-            
+
             {hours.map((hour, hourIndex) => (
               <React.Fragment key={hourIndex}>
                 <div className="text-right pr-4">{hour}</div>

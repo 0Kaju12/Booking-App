@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setLoginData } from '../utils/authSlice';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // useNavigate hook for navigation
+  const dispatch = useDispatch(); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +24,13 @@ function Login() {
       const data = await response.json();
       if (response.ok) {
         console.log('Login successful:', data);
-        setError(''); // Clear any previous error
+        setError('');
+        dispatch(setLoginData({
+          token: data.token, 
+          name: data.user.name, 
+          email: data.user.email, 
+          role: data.user.role
+        }));
         navigate('/dashboard'); // Redirect to the dashboard on successful login
       } else {
         setError(data.message || 'Login failed. Please try again.');
