@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setLoginData } from '../utils/authSlice';
 
@@ -33,16 +33,20 @@ function Login() {
           email: data.user.email, 
           role: data.user.role
         }));
-        navigate('/dashboard');
+        
+        // Redirect based on role
+        if (data.user.role === 'manager') {
+          navigate('/admin-dashboard');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         setError(data.message || 'Login failed. Please try again.');
       }
     } catch (error) {
       setError('Error during login. Please try again later.');
     }
-  
   };
-  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

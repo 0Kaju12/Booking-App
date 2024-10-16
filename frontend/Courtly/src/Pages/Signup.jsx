@@ -10,6 +10,7 @@ function Signup() {
   const [error, setError] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate(); 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -34,7 +35,13 @@ function Signup() {
           email: data.user.email, 
           role: data.user.role
         }));
-        navigate('/dashboard');
+
+        // Redirect based on role
+        if (data.user.role === 'manager') {
+          navigate('/admin-dashboard');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         setError(data.message || 'Signup failed. Please try again.');
       }
