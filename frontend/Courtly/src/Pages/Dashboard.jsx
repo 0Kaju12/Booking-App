@@ -16,8 +16,26 @@ const Dashboard = () => {
   const [courts, setCourts] = useState([]);
   const [selectedCenter, setSelectedCenter] = useState("");
   const [selectedSport, setSelectedSport] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(null); // Changed to null for better handling
   const [showCourts, setShowCourts] = useState(false);
+
+  const allTimeSlots = [];
+
+  // Helper function to format time
+  const formatTime = (hour) => {
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12; // Convert 0 to 12 for midnight
+    return hour12 + ":00 " + ampm;
+  };
+
+  // Generate all time slots from 12:00 AM to 11:00 PM
+  for (let i = 0; i < 24; i++) {
+    const startTime = formatTime(i);
+    const endTime = formatTime(i + 1);
+    allTimeSlots.push(`${startTime} - ${endTime}`);
+  }
+
+  console.log("All Time Slots:", allTimeSlots);
 
   // Fetch all centers on component mount
   useEffect(() => {
@@ -33,6 +51,7 @@ const Dashboard = () => {
 
         if (response.ok) {
           const data = await response.json();
+          console.log("Fetched Centers:", data.centers);
           setCenters(data.centers);
         } else {
           console.error("Failed to fetch centers:", response.status);
@@ -63,6 +82,7 @@ const Dashboard = () => {
 
           if (response.ok) {
             const data = await response.json();
+            console.log("Fetched Sports for Center:", data.sports);
             setSports(data.sports);
             setSelectedSport(""); // Reset sport selection
             setCourts([]); // Reset courts on center change
@@ -97,6 +117,7 @@ const Dashboard = () => {
 
           if (response.ok) {
             const data = await response.json();
+            console.log("Fetched Courts for Sport:", data.courts);
             setCourts(data.courts);
           } else {
             console.error("Failed to fetch courts:", response.status);
@@ -112,13 +133,11 @@ const Dashboard = () => {
 
   const handleDateChange = (date) => {
     setDate(date);
+    console.log("Selected Date:", date);
   };
 
-  // const handleBooking = (courtId, slot, date) => {
-  //   console.log(`Booking court ${courtId} for slot ${slot} on date ${date}`);
-  // };
-
   const handleShowCourts = () => {
+    console.log("Show Courts clicked. Selected Sport:", selectedSport, "Date:", date);
     if (selectedSport && date) {
       setShowCourts(true);
     } else {
@@ -131,13 +150,16 @@ const Dashboard = () => {
     localStorage.removeItem("username");
     navigate("/");
   };
+
   const handleBooking = async (courtId, slot, date) => {
     try {
       const formattedDate = `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1)
         .toString()
         .padStart(2, '0')}-${date.getFullYear()}`;
       
-      const response = await fetch("http://localhost:5000/api/manager/book", {
+      console.log("Booking Info:", { courtId, slot, formattedDate });
+
+      const response = await fetch("http://localhost:5000/api/bookings/book", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -153,6 +175,20 @@ const Dashboard = () => {
       if (response.ok) {
         const data = await response.json();
         alert(data.message || "Booking successful!");
+
+        // Update the state to mark the slot as booked
+        setCourts((prevCourts) =>
+          prevCourts.map((court) =>
+            court._id === courtId // Changed 'court.id' to 'court._id' to match fetched data
+              ? {
+                  ...court,
+                  slots: court.slots.map((s) =>
+                    s.slot === slot ? { ...s, available: false } : s
+                  ),
+                }
+              : court
+          )
+        );
         setShowCourts(false);
       } else {
         const errorData = await response.json();
@@ -163,8 +199,6 @@ const Dashboard = () => {
       alert("An error occurred while booking. Please try again.");
     }
   };
-  
-  
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -207,7 +241,10 @@ const Dashboard = () => {
             <label className="block mb-2">Select Center:</label>
             <select
               value={selectedCenter}
-              onChange={(e) => setSelectedCenter(e.target.value)}
+              onChange={(e) => {
+                setSelectedCenter(e.target.value);
+                console.log("Selected Center:", e.target.value); // Log selected center
+              }}
               className="p-2 border rounded"
             >
               <option value="">Select a center</option>
@@ -223,9 +260,12 @@ const Dashboard = () => {
             <label className="block mb-2">Select Sport:</label>
             <select
               value={selectedSport}
-              onChange={(e) => setSelectedSport(e.target.value)}
+              onChange={(e) => {
+                setSelectedSport(e.target.value);
+                console.log("Selected Sport:", e.target.value); // Log selected sport
+              }}
               className="p-2 border rounded"
-              disabled={!selectedCenter} // Disable until a center is selected
+              disabled={!selectedCenter}
             >
               <option value="">Select a sport</option>
               {sports.map((sport) => (
@@ -237,61 +277,52 @@ const Dashboard = () => {
           </div>
 
           <div>
-            <label className="block mb-2">Select Date:</label>
-            <DatePicker
-              selected={date}
-              onChange={handleDateChange}
-              minDate={new Date()}
-              className="bg-gray-200 text-gray-700 px-4 py-2 rounded cursor-pointer"
-              dateFormat="dd/MM/yyyy"
-              disabled={!selectedSport} // Disable until a sport is selected
-            />
-          </div>
+        <label className="block mb-2">Select Date:</label>
+        <DatePicker
+          selected={date}
+          onChange={handleDateChange}
+          className="p-2 border rounded"
+          dateFormat="dd/MM/yyyy"
+          placeholderText="Select a date"
+          minDate={new Date()} // Prevent past date selection
+        />
+      </div>
+
+          <button
+            onClick={handleShowCourts}
+              className="bg-blue-600 text-white text-sm px-2 py-5 rounded hover:bg-blue-700 transition-colors"
+          >
+            Show Courts
+          </button>
         </div>
 
-        {/* Submit button to show courts */}
-        <button
-          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-700 transition duration-300 mb-4"
-          onClick={handleShowCourts}
-          disabled={!selectedSport || !date} // Disable until a sport and date are selected
-        >
-          Show Available Courts
-        </button>
-
-        {showCourts && selectedSport && date && (
-          <div className="overflow-x-auto">
-            <h2 className="text-xl font-semibold mb-2">Available Courts</h2>
-            <table className="min-w-full border border-gray-300">
-              <thead>
-                <tr>
-                  <th className="border-b p-2 text-center font-bold">Time Slot</th>
-                  {courts.map((court) => (
-                    <th key={court._id} className="border-b p-2 text-center font-bold">{court.name}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {courts.length > 0 && courts[0].slots.map((slot, index) => (
-                  <tr key={index}>
-                    <td className="border-b p-2 text-center">{slot.slot}</td>
-                    {courts.map((court) => (
-                      <td key={court._id} className="border-b p-2 text-center">
-                        {slot.available ? (
-                          <button
-                            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-700 transition duration-300"
-                            onClick={() => handleBooking(court._id, slot.slot, date)}
-                          >
-                            Book
-                          </button>
-                        ) : (
-                          <span className="text-red-500">Booked</span>
-                        )}
-                      </td>
+        {/* Court availability section */}
+        {showCourts && (
+          <div className="mt-4">
+            <h2 className="text-xl font-bold mb-2">Available Courts</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {courts.map((court) => (
+                <div key={court.id} className="bg-white p-4 border rounded shadow">
+                  <h3 className="font-bold">{court.name}</h3>
+                  <div className="mt-2">
+                    {court.slots.map((slot) => (
+                      <button
+                        key={slot.slot}
+                        onClick={() => handleBooking(court.id, slot.slot, date)}
+                        disabled={!slot.available}
+                        className={`mr-2 mb-2 px-2 py-1 rounded ${
+                          slot.available
+                            ? "bg-green-500 text-white hover:bg-green-600"
+                            : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                        }`}
+                      >
+                        {slot.slot}
+                      </button>
                     ))}
-                  </tr>
-                ))} 
-              </tbody>
-            </table>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
