@@ -1,5 +1,4 @@
 import React,{useState} from 'react';
-import Signup from './Signup';
 import { Link } from 'react-router-dom';
 
 function Login() {
@@ -28,14 +27,14 @@ function Login() {
     } catch (error) {
         console.error('Error during login:', error);
     }
-    }
+  }
     
   return (
 
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="p-8 rounded-lg shadow-lg w-full max-w-sm bg-blue-600 bg-opacity-40 shadow-xl backdrop-blur-md">
         <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Login</h2>
-        <form>
+        <form onClick={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
               Email

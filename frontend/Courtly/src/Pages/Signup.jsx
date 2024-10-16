@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 function Signup(){
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [name,useName] = useState('')
+  const [name,setName] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,13 +15,12 @@ function Signup(){
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, password }), // Include name in the request body
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await response.json();
       if (response.ok) {
         console.log('Signup successful:', data);
-        // Optionally redirect or show a success message here
       } else {
         console.error('Signup failed:', data.message);
       }
@@ -33,17 +32,17 @@ function Signup(){
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="p-8 rounded-lg shadow-lg w-full max-w-sm bg-blue-600 bg-opacity-40 shadow-xl backdrop-blur-md">
           <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Signup</h2>
-          <form>
+          <form onClick={handleSubmit}> 
           <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
                 Name
               </label>
               <input
-                type="email"
-                id="email"
-                placeholder="Enter your email"
+                type="text"
+                id="name"
+                placeholder="Enter your name"
                 className="w-full px-3 py-2 border rounded-md text-gray-700 focus:outline-none focus:border-blue-500"
-                value={email}
+                value={name}
                 onChange={(e) => setName(e.target.value)} 
                 required
               />
@@ -53,7 +52,7 @@ function Signup(){
                 Email
               </label>
               <input
-                type="email"
+                type="text"
                 id="email"
                 placeholder="Enter your email"
                 className="w-full px-3 py-2 border rounded-md text-gray-700 focus:outline-none focus:border-blue-500"
@@ -80,7 +79,7 @@ function Signup(){
               type="submit"
               className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"
             >
-              Login
+              Sign up
             </button>
           </form>
           <p className="mt-4 text-sm text-center text-gray-600">
