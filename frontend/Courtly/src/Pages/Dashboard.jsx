@@ -42,7 +42,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/manager/centers", {
+        const response = await fetch("https://booking-app-oolj.onrender.com/api/manager/centers", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -71,7 +71,7 @@ const Dashboard = () => {
       if (selectedCenter) {
         try {
           const response = await fetch(
-            `http://localhost:5000/api/manager/centers/${selectedCenter}/sports`,
+            `https://booking-app-oolj.onrender.com/api/manager/centers/${selectedCenter}/sports`,
             {
               method: "GET",
               headers: {
@@ -107,7 +107,7 @@ const Dashboard = () => {
       if (selectedSport) {
         try {
           const response = await fetch(
-            `http://localhost:5000/api/manager/sports/${selectedSport}/courts`,
+            `https://booking-app-oolj.onrender.com/api/manager/sports/${selectedSport}/courts`,
             {
               method: "GET",
               headers: {
@@ -187,7 +187,7 @@ const Dashboard = () => {
         )
       );
 
-      const response = await fetch("http://localhost:5000/api/bookings/book", {
+      const response = await fetch("https://booking-app-oolj.onrender.com/api/bookings/book", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

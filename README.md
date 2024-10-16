@@ -240,5 +240,5 @@ DELETE /api/resources/:id - Delete resource (Protected)
 ## Links
 
 
-* **Frontend Deployment:** [https://your-frontend.vercel.app](https://your-frontend.vercel.app)
-* **Backend API:** [https://api.your-project.com](https://api.your-project.com)
+* **Frontend Deployment:** [https://unrivaled-rugelach-c1dc24.netlify.app/](https://your-frontend.vercel.app)
+* **Backend API:** [https://booking-app-oolj.onrender.com](https://api.your-project.com)
