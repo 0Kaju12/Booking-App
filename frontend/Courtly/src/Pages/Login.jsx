@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setLoginData } from '../utils/authSlice';
 
@@ -8,10 +8,12 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const dispatch = useDispatch(); 
+  // const navigate = Navigate();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
@@ -20,25 +22,29 @@ function Login() {
         },
         body: JSON.stringify({ email, password }),
       });
-
+  
       const data = await response.json();
       if (response.ok) {
         console.log('Login successful:', data);
-        setError('');
+        setError(''); // Clear any previous errors
+        // Store the username in local storage
+        localStorage.setItem('username', data.user.name);
         dispatch(setLoginData({
           token: data.token, 
           name: data.user.name, 
           email: data.user.email, 
           role: data.user.role
         }));
-        navigate('/dashboard'); // Redirect to the dashboard on successful login
+        navigate('/dashboard');
       } else {
         setError(data.message || 'Login failed. Please try again.');
       }
     } catch (error) {
       setError('Error during login. Please try again later.');
     }
+  
   };
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

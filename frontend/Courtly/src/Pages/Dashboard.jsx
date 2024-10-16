@@ -1,18 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, Clock, Users } from 'lucide-react';
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from '../utils/authSlice';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom'; 
 
 function Dashboard() {
   const courts = ['Court 1', 'Court 2', 'Court 3', 'Court 4', 'Court 5', 'Court 6'];
   const hours = ['4 AM', '5 AM', '6 AM', '7 AM', '8 AM', '9 AM', '10 AM'];
-  const user = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state.auth.user); // Keep user for other info
+  const [username, setUsername] = useState('');
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
+
+  useEffect(() => {
+    // Get the username from local storage on component mount
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
 
   const handleLogout = () => {
-    dispatch(logout()); // Call logout as a function
+    dispatch(logout());
+    localStorage.removeItem('username'); // Clear the username on logout
     navigate('/'); // Redirect to the root route after logging out
   };
 
@@ -47,9 +57,9 @@ function Dashboard() {
         </nav>
         <div className="absolute bottom-6 left-6 flex items-center space-x-2">
           <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
-            TN
+            {username.charAt(0)} {/* Display the first letter of the username */}
           </div>
-          <span>{user.name}</span>
+          <span>{username}</span> {/* Use username from local storage */}
         </div>
         {/* Logout Button */}
         <div className="absolute bottom-16 left-6">
