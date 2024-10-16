@@ -8,7 +8,6 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const dispatch = useDispatch(); 
-  // const navigate = Navigate();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -26,8 +25,7 @@ function Login() {
       const data = await response.json();
       if (response.ok) {
         console.log('Login successful:', data);
-        setError(''); // Clear any previous errors
-        // Store the username in local storage
+        setError(''); 
         localStorage.setItem('username', data.user.name);
         dispatch(setLoginData({
           token: data.token, 
